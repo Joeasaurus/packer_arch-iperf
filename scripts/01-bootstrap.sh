@@ -7,11 +7,45 @@ pacstrap /mnt/rootfs base
 genfstab -U -p /mnt >> /mnt/etc/fstab
 
 # add dropbear unit files
-mv /tmp/dropbear.socket /mnt/etc/systemd/system/
-mv /tmp/dropbear@.service /mnt/etc/systemd/system/
-mv /tmp/dropbearkey.service /mnt/etc/systemd/system/
+cat > /mnt/etc/systemd/system/dropbear.socket <<EOF
+[Unit]
+Conflicts=dropbear.service
 
-cat > /mnt/rootfs/usr/local/bin/setup.sh <<EOF
+[Socket]
+ListenStream=22
+Accept=yes
+
+[Install]
+WantedBy=sockets.target
+Also=dropbear-keygen.service
+EOF
+
+cat > /mnt/etc/systemd/system/dropbear@.service <<EOF
+[Unit]
+Description=SSH Per-Connection Server
+Wants=dropbear-keygen.service
+After=syslog.target dropbear-keygen.service
+
+[Service]
+EnvironmentFile=-/etc/default/dropbear
+ExecStart=-/usr/bin/dropbear -i -r /etc/dropbear/dropbear_rsa_host_key $DROPBEAR_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+StandardInput=socket
+KillMode=process
+EOF
+
+cat > /mnt/etc/systemd/system/dropbear-keygen.service <<EOF
+[Unit]
+Description=SSH Key Generation
+ConditionPathExists=|!/etc/dropbear/dropbear_rsa_host_key
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
+RemainAfterExit=yes
+EOF
+
+cat > /mnt/rootfs/setup.sh <<EOF
 #!/bin/sh -x
 
 echo 'archlinux' > /etc/hostname
@@ -40,7 +74,7 @@ ln -s /usr/lib/systemd/system/dhcpcd.service /etc/systemd/system/multi-user.targ
 
 ln -s /etc/systemd/system/dropbear.socket /etc/systemd/system/socket.target.wants/dropbear.socket
 
-ln -s /etc/systemd/system/dropbearkey.service /etc/systemd/system/multi-user.target.wants/dropbearkey.service
+ln -s /etc/systemd/system/dropbear-keygen.service /etc/systemd/system/multi-user.target.wants/dropbear-keygen.service
 
 groupadd vagrant
 

@@ -37,21 +37,6 @@
   ],
   "provisioners": [
     {
-      "type": "file",
-      "source": "files/dropbear.socket",
-      "destination": "/tmp/dropbear.docket"
-    },
-    {
-      "type": "file",
-      "source": "files/dropbear@.service",
-      "destination": "/tmp/dropbear@.service"
-    },
-    {
-      "type": "file",
-      "source": "files/dropbearkey.service",
-      "destination": "/tmp/dropbearkey.service"
-    },
-    {
       "type": "shell",
       "execute_command": "{{.Vars}} {{.Path}}",
       "scripts": [
