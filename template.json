@@ -1,0 +1,69 @@
+{
+  "variables": {
+    "mirror": "http://mirror.us.leaseweb.net"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--memory", "2048" ],
+        [ "modifyvm", "{{.Name}}", "--cpus",   "2" ],
+        [ "modifyvm", "{{.Name}}", "--ioapic", "on" ]
+      ],
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "archlinux-2015-01-01",
+      "iso_url": "{{user `mirror`}}/archlinux/iso/2015.01.01/archlinux-2015.01.01-dual.iso",
+      "iso_checksum": "a8344dde2e9a22e6a66d10ee016818c1491a9054",
+      "iso_checksum_type": "sha1",
+      "guest_os_type": "ArchLinux_64",
+      "guest_additions_mode": "disable",
+      "http_directory": ".",
+      "boot_wait": "5s",
+      "boot_command": [
+        "<enter><wait10><wait10>",
+        "echo 'root:vagrant' | chpasswd<enter>",
+        "ssh-keygen -A<enter>",
+        "systemctl reenable sshd<enter>",
+        "systemctl start sshd<enter>"
+      ],
+      "disk_size": 49152,
+      "hard_drive_interface": "sata",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_username": "root",
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "systemctl poweroff"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "files/dropbear.socket",
+      "destination": "/tmp/dropbear.docket"
+    },
+    {
+      "type": "file",
+      "source": "files/dropbear@.service",
+      "destination": "/tmp/dropbear@.service"
+    },
+    {
+      "type": "file",
+      "source": "files/dropbearkey.service",
+      "destination": "/tmp/dropbearkey.service"
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} {{.Path}}",
+      "scripts": [
+        "scripts/00-disk.sh",
+        "scripts/01-bootstrap.sh"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "output": "archlinux-{{.Provider}}.box"
+    }
+  ]
+}
