@@ -1,84 +1,42 @@
 #!/bin/sh -x
 
+echo "Server = http://ftp.tku.edu.tw/Linux/ArchLinux/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
+pacman -Syy
+
 # base installation
-pacstrap /mnt/rootfs base
+pacstrap /mnt/root base openssh grub-bios virtualbox-guest-modules
 
 # create fstab
-genfstab -U -p /mnt >> /mnt/rootfs/etc/fstab
+genfstab -p /mnt >> /mnt/root/etc/fstab
 
-# add dropbear unit files
-cat > /mnt/rootfs/etc/systemd/system/dropbear.socket <<EOF
-[Unit]
-Conflicts=dropbear.service
+cat > /mnt/root/etc/pre.sh <<EOF
+echo "archlinux" > /etc/hostname
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 
-[Socket]
-ListenStream=22
-Accept=yes
-
-[Install]
-WantedBy=sockets.target
-Also=dropbear-keygen.service
-EOF
-
-cat > /mnt/rootfs/etc/systemd/system/dropbear@.service <<EOF
-[Unit]
-Description=SSH Per-Connection Server
-Wants=dropbear-keygen.service
-After=syslog.target dropbear-keygen.service
-
-[Service]
-EnvironmentFile=-/etc/default/dropbear
-ExecStart=-/usr/bin/dropbear -i -r /etc/dropbear/dropbear_rsa_host_key $DROPBEAR_OPTS
-ExecReload=/bin/kill -HUP $MAINPID
-StandardInput=socket
-KillMode=process
-EOF
-
-cat > /mnt/rootfs/etc/systemd/system/dropbear-keygen.service <<EOF
-[Unit]
-Description=SSH Key Generation
-ConditionPathExists=|!/etc/dropbear/dropbear_rsa_host_key
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
-RemainAfterExit=yes
-EOF
-
-cat > /mnt/rootfs/setup.sh <<EOF
-#!/bin/sh -x
-
-echo 'archlinux' > /etc/hostname
-echo 'KEYMAP=us' > /etc/vconsole.conf
-echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen
-echo 'LANG=en_US.UTF-8' > /etc/locale.conf
-
-ln -s /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-
+ln -s /usr/share/zoneinfo/UTC /etc/localtime
 hwclock --systohc --utc
 
 locale-gen
 
+sed -i 's/^\(HOOKS.*\)fsck/\1/' /etc/mkinitcpio.conf
 mkinitcpio -p linux
 
-pacman -S --noconfirm dropbear
+modprobe dm-mod
 
-# pacman -S --noconfirm syslinux
-# syslinux-install_update -i -a -m
-# sed -i 's/sda3/sda1/' /boot/syslinux/syslinux.cfg
-# sed -i 's/TIMEOUT 50/TIMEOUT 10/' /boot/syslinux/syslinux.cfg
+grub-install --recheck /dev/sda
+grub-mkconfig -o /boot/grub/grub.cfg
 
-echo "root:archlinux" | chpasswd
-
-ln -s /usr/lib/systemd/system/dhcpcd.service /etc/systemd/system/multi-user.target.wants/dhcpcd.service
-
-ln -s /etc/systemd/system/dropbear.socket /etc/systemd/system/socket.target.wants/dropbear.socket
-
-ln -s /etc/systemd/system/dropbear-keygen.service /etc/systemd/system/multi-user.target.wants/dropbear-keygen.service
+systemctl enable dhcpcd.service
+systemctl enable sshd.service
 
 groupadd vagrant
-useradd -p `openssl passwd -crypt 'vagrant'` -m -g users -G vagrant vagrant
 
+useradd -m -g users -G vagrant vagrant
+
+echo "root:archlinux" | chpasswd
+echo "vagrant:vagrant" | chpasswd
+
+mkdir -p /etc/sudoers.d
 echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10-vagrant
 echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10-vagrant
 chmod 0440 /etc/sudoers.d/10-vagrant
@@ -88,11 +46,13 @@ curl -o /home/vagrant/.ssh/authorized_keys -fsSL http://git.io/FKMe
 chown vagrant:users /home/vagrant/.ssh/authorized_keys
 chmod 0600 /home/vagrant/.ssh/authorized_keys
 
+cat > /etc/modules-load.d/virtualbox.conf <<CONF
+vboxguest
+vboxsf
+vboxvideo
+CONF
+
 pacman -Scc --noconfirm
 EOF
 
-arch-chroot /mnt/rootfs /bin/sh /setup.sh
-rm /mnt/rootfs/setup.sh
-umount /mnt/rootfs
-umount /mnt
-systemctl reboot
+arch-chroot /mnt/root sh -c "bash -x /etc/pre.sh"

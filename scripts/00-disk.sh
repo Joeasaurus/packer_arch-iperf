@@ -1,18 +1,26 @@
 #!/bin/sh -x
-DISK="/dev/sda"
 
-# wipe disk, and create partition table
-sgdisk --zap ${DISK}
-dd if=/dev/zero of=${DISK} bs=512 count=2048
-wipefs --all ${DISK}
-sgdisk --new=1:0:0 ${DISK}
-sgdisk ${DISK} --attributes=1:set:2
+sfdisk --force /dev/sda <<EOF
+# partition table of /dev/sda
+unit: sectors
 
-# create & mount btrfs filesytem
-mkfs.btrfs -f -L root ${DISK}1
-mount ${DISK}1 /mnt
+/dev/sda1 : start=  2048, size= 204800, Id=83
+/dev/sda2 : start=  206848, size= , Id=83
+/dev/sda3 : start=  0, size=  0, Id= 0
+/dev/sda4 : start=  0, size=  0, Id= 0
+EOF
 
-# create & mount subvolumes
+mkfs.ext2 -L boot /dev/sda1
+mkfs.btrfs -L root /dev/sda2
+
+mount /dev/sda2 /mnt
+
+mkdir -p /mnt/boot
+
+mount /dev/sda1 /mnt/boot
+
 btrfs subvol create /mnt/@
-mkdir -p /mnt/rootfs
-mount -o subvol=@ ${DISK}1 /mnt/rootfs
+
+mkdir -p /mnt/root
+
+mount -o subvol=@ /dev/sda2 /mnt/root
