@@ -68,7 +68,7 @@ pacman -S --noconfirm dropbear
 # sed -i 's/sda3/sda1/' /boot/syslinux/syslinux.cfg
 # sed -i 's/TIMEOUT 50/TIMEOUT 10/' /boot/syslinux/syslinux.cfg
 
-echo "root:`openssl passwd -crypt 'vagrant'`" | chpasswd
+echo "root:archlinux" | chpasswd
 
 ln -s /usr/lib/systemd/system/dhcpcd.service /etc/systemd/system/multi-user.target.wants/dhcpcd.service
 
