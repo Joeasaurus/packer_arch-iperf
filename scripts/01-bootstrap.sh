@@ -77,8 +77,7 @@ ln -s /etc/systemd/system/dropbear.socket /etc/systemd/system/socket.target.want
 ln -s /etc/systemd/system/dropbear-keygen.service /etc/systemd/system/multi-user.target.wants/dropbear-keygen.service
 
 groupadd vagrant
-
-useradd -p `openssl passwd -crypt 'vagrant'` -m -g users -G vagrant,vboxsf vagrant
+useradd -p `openssl passwd -crypt 'vagrant'` -m -g users -G vagrant vagrant
 
 echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10-vagrant
 echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10-vagrant
