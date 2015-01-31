@@ -4,10 +4,10 @@
 pacstrap /mnt/rootfs base
 
 # create fstab
-genfstab -U -p /mnt >> /mnt/etc/fstab
+genfstab -U -p /mnt >> /mnt/rootfs/etc/fstab
 
 # add dropbear unit files
-cat > /mnt/etc/systemd/system/dropbear.socket <<EOF
+cat > /mnt/rootfs/etc/systemd/system/dropbear.socket <<EOF
 [Unit]
 Conflicts=dropbear.service
 
@@ -20,7 +20,7 @@ WantedBy=sockets.target
 Also=dropbear-keygen.service
 EOF
 
-cat > /mnt/etc/systemd/system/dropbear@.service <<EOF
+cat > /mnt/rootfs/etc/systemd/system/dropbear@.service <<EOF
 [Unit]
 Description=SSH Per-Connection Server
 Wants=dropbear-keygen.service
@@ -34,7 +34,7 @@ StandardInput=socket
 KillMode=process
 EOF
 
-cat > /mnt/etc/systemd/system/dropbear-keygen.service <<EOF
+cat > /mnt/rootfs/etc/systemd/system/dropbear-keygen.service <<EOF
 [Unit]
 Description=SSH Key Generation
 ConditionPathExists=|!/etc/dropbear/dropbear_rsa_host_key
