@@ -61,7 +61,7 @@ locale-gen
 
 mkinitcpio -p linux
 
-pacman -S --noconfirm dropbear btrfs-progs
+pacman -S --noconfirm dropbear
 
 # pacman -S --noconfirm syslinux
 # syslinux-install_update -i -a -m
