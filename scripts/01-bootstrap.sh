@@ -94,7 +94,6 @@ EOF
 
 arch-chroot /mnt/rootfs /bin/sh /setup.sh
 rm /mnt/rootfs/setup.sh
-umount /mnt/rootfs/home
 umount /mnt/rootfs
 umount /mnt
 systemctl reboot

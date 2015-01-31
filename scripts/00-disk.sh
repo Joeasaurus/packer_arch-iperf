@@ -14,8 +14,5 @@ mount ${DISK}1 /mnt
 
 # create & mount subvolumes
 btrfs subvol create /mnt/@
-btrfs subvol create /mnt/@home
 mkdir -p /mnt/rootfs
 mount -o subvol=@ ${DISK}1 /mnt/rootfs
-mkdir -p /mnt/rootfs/home
-mount -o subvol=@home ${DISK}1 /mnt/rootfs/home
