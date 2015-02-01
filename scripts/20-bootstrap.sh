@@ -11,7 +11,7 @@ pacman -Syy
 pacstrap /mnt/root base
 
 # install required packages
-arch-chroot pacman -S --noconfirm \
+arch-chroot /mnt/root pacman -S --noconfirm \
   openssh \
   grub-bios \
   virtualbox-guest-utils-nox \
@@ -64,12 +64,14 @@ echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10-vagrant
 echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/10-vagrant
 chmod 0440 /etc/sudoers.d/10-vagrant
 
-install -o vagrant -g users /home/vagrant/.zshrc
+echo "#" | tee /home/vagrant/.zshrc
+
 install -d -o vagrant -g users -m 0700 /home/vagrant/.ssh
 curl -o /home/vagrant/.ssh/authorized_keys -fsSL \
   https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub
-chown vagrant:users /home/vagrant/.ssh/authorized_keys
+chown vagrant:users /home/vagrant/.ssh/authorized_keys /home/vagrant/.zshrc
 chmod 0600 /home/vagrant/.ssh/authorized_keys
+chmod 0640 /home/vagrant/.zshrc
 
 cat > /etc/modules-load.d/virtualbox.conf <<CONF
 vboxguest
@@ -77,7 +79,7 @@ vboxsf
 vboxvideo
 CONF
 
-pacman -R reiserfsprogs xfsprogs pcmciautils pciutils man-pages bash
+pacman -Rcns --noconfirm reiserfsprogs xfsprogs pcmciautils pciutils man-pages
 pacman -Scc --noconfirm
 EOF
 
