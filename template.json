@@ -28,9 +28,9 @@
       ],
       "disk_size": 20480,
       "hard_drive_interface": "sata",
-      "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
       "ssh_username": "root",
+      "ssh_password": "{{user `password`}}",
       "shutdown_command": "systemctl poweroff"
     }
   ],
@@ -40,7 +40,9 @@
       "execute_command": "{{.Vars}} {{.Path}}",
       "scripts": [
         "scripts/10-disk.sh",
-        "scripts/20-bootstrap.sh",
+        "scripts/20-base.sh",
+        "scripts/25-packages.sh",
+        "scripts/30-bootstrap.sh",
         "scripts/90-cleanup.sh"
       ]
     }
