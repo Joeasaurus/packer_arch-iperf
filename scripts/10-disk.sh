@@ -10,17 +10,16 @@ unit: sectors
 /dev/sda4 : start=  0, size=  0, Id= 0
 EOF
 
-mkfs.ext2 -L boot /dev/sda1
+# create filesystems
+mkfs.ext2  -L boot /dev/sda1
 mkfs.btrfs -L root /dev/sda2
 
+# mount the partitions
 mount /dev/sda2 /mnt
-
 mkdir -p /mnt/boot
-
 mount /dev/sda1 /mnt/boot
 
+# create the root subvolume & mount it
 btrfs subvol create /mnt/@
-
 mkdir -p /mnt/root
-
 mount -o subvol=@ /dev/sda2 /mnt/root

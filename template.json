@@ -7,9 +7,8 @@
     {
       "type": "virtualbox-iso",
       "vboxmanage": [
-        [ "modifyvm", "{{.Name}}", "--memory", "2048" ],
-        [ "modifyvm", "{{.Name}}", "--cpus",   "2" ],
-        [ "modifyvm", "{{.Name}}", "--ioapic", "on" ]
+        [ "modifyvm", "{{.Name}}", "--memory", "1024" ],
+        [ "modifyvm", "{{.Name}}", "--cpus",   "1" ]
       ],
       "virtualbox_version_file": ".vbox_version",
       "vm_name": "archlinux-2015-01-01",
@@ -27,7 +26,7 @@
         "systemctl reenable sshd.service<enter>",
         "systemctl start sshd.service<enter>"
       ],
-      "disk_size": 49152,
+      "disk_size": 20480,
       "hard_drive_interface": "sata",
       "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
@@ -40,16 +39,16 @@
       "type": "shell",
       "execute_command": "{{.Vars}} {{.Path}}",
       "scripts": [
-        "scripts/00-disk.sh",
-        "scripts/01-bootstrap.sh",
-        "scripts/99-shutdown.sh"
+        "scripts/10-disk.sh",
+        "scripts/20-bootstrap.sh",
+        "scripts/90-cleanup.sh"
       ]
     }
   ],
   "post-processors": [
     {
       "type": "vagrant",
-      "output": "archlinux-2015-01-01.box"
+      "output": "archlinux.box"
     }
   ]
 }

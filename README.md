@@ -18,8 +18,12 @@ My goal was to roughly duplicate the attributes from a
 * 512 MB memory
 * Only a single /root partition (ext4)
 * No swap
-* Includes the `base` and `base-devel` package groups
-* OpenSSH is also installed and enabled on boot
+* Includes the `base` package group, along with:
+  - Salt
+  - Docker
+  - GlusterFS
+  - OpenSSH
+  - ZSH
 
 The installation script follows the
 [official installation guide](https://wiki.archlinux.org/index.php/Installation_Guide)
