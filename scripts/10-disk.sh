@@ -1,5 +1,3 @@
-#!/bin/sh -x
-
 sfdisk --force /dev/sda <<EOF
 # partition table of /dev/sda
 unit: sectors
@@ -14,8 +12,11 @@ EOF
 mkfs.ext2  -L boot /dev/sda1
 mkfs.btrfs -L root /dev/sda2
 
-# mount the partitions
-mount /dev/sda2 /mnt
+# mount the root partition
+mkdir -p /mnt
+mount -o compress /dev/sda2 /mnt
+
+# mount the boot partition
 mkdir -p /mnt/boot
 mount /dev/sda1 /mnt/boot
 
