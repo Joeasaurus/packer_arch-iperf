@@ -1,13 +1,10 @@
+arch-chroot /mnt/root pacman-db-upgrade
+
 arch-chroot /mnt/root pacman -S --noconfirm \
+  virtualbox-guest-utils-nox \
   openssh \
   grub-bios \
-  virtualbox-guest-utils-nox \
   sudo \
-  fish \
-  docker \
-  salt-zmq \
-  python2-pygit2 \
-  glusterfs \
   rpcbind \
   net-tools \
-  btrfs-progs
+  wget

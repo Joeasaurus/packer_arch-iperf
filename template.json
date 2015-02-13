@@ -1,61 +1,64 @@
 {
-  "variables": {
-    "mirror": "http://ftp.tku.edu.tw/Linux/ArchLinux",
-    "password": "archlinux"
-  },
-  "builders": [
-    {
-      "type": "virtualbox-iso",
-      "vboxmanage": [
-        [ "modifyvm", "{{.Name}}", "--memory", "1024" ],
-        [ "modifyvm", "{{.Name}}", "--cpus",   "1" ]
-      ],
-      "virtualbox_version_file": ".vbox_version",
-      "vm_name": "archlinux-2015-01-01",
-      "iso_url": "{{ user `mirror` }}/iso/2015.01.01/archlinux-2015.01.01-dual.iso",
-      "iso_checksum": "a8344dde2e9a22e6a66d10ee016818c1491a9054",
-      "iso_checksum_type": "sha1",
-      "guest_os_type": "ArchLinux_64",
-      "guest_additions_mode": "disable",
-      "http_directory": ".",
-      "boot_wait": "5s",
-      "boot_command": [
-        "<enter><wait10><wait10>",
-        "echo 'root:{{ user `password` }}' | chpasswd<enter>",
-        "ssh-keygen -A<enter><wait>",
-        "systemctl reenable sshd.service<enter>",
-        "systemctl start sshd.service<enter>"
-      ],
-      "disk_size": 20480,
-      "hard_drive_interface": "sata",
-      "ssh_port": 22,
-      "ssh_username": "root",
-      "ssh_password": "{{ user `password` }}",
-      "shutdown_command": "systemctl poweroff"
-    }
-  ],
-  "provisioners": [
-    {
-      "type": "shell",
-      "environment_vars": [
-        "MIRROR={{ user `mirror` }}",
-        "PW={{ user `password` }}"
-      ],
-      "execute_command": "{{.Vars}} sh -x {{.Path}}",
-      "scripts": [
-        "scripts/10-disk.sh",
-        "scripts/20-base.sh",
-        "scripts/25-packages.sh",
-        "scripts/30-bootstrap.sh",
-        "scripts/90-cleanup.sh"
-      ]
-    }
-  ],
-  "post-processors": [
-    {
-      "type": "vagrant",
-      "compression_level": "9",
-      "output": "archlinux.box"
-    }
-  ]
+	"variables": {
+			"iso_url": "http://mirror.bytemark.co.uk/archlinux/iso/2015.02.01/archlinux-2015.02.01-dual.iso",
+			"iso_checksum": "7291baa71630a7603ef09e843b3b321e48024f9f",
+			"iso_checksum_type": "sha1",
+
+			"iperf_version": "3.0.11"
+	},
+	"builders": [
+		{
+			"type": "virtualbox-iso",
+			"vboxmanage": [
+				[ "modifyvm", "{{.Name}}", "--memory", "512" ],
+				[ "modifyvm", "{{.Name}}", "--cpus",   "2" ],
+				[ "modifyvm", "{{.Name}}", "--bioslogodisplaytime", "1" ]
+			],
+			"virtualbox_version_file": ".vbox_version",
+			"vm_name": "archlinux-2015-02-01",
+			"iso_url": "{{ user `iso_url` }}",
+			"iso_checksum": "{{ user `iso_checksum` }}",
+			"iso_checksum_type": "{{ user `iso_checksum_type` }}",
+			"guest_os_type": "ArchLinux_64",
+			"guest_additions_mode": "disable",
+			"http_directory": ".",
+			"boot_wait": "10s",
+			"boot_command": [
+				"<enter><wait10><wait10>",
+				"echo 'root:root' | chpasswd<enter>",
+				"ssh-keygen -A<enter><wait>",
+				"systemctl reenable sshd.service<enter>",
+				"systemctl start sshd.service<enter>"
+			],
+			"disk_size": 1024,
+			"hard_drive_interface": "sata",
+			"ssh_port": 22,
+			"ssh_username": "root",
+			"ssh_password": "root",
+			"shutdown_command": "systemctl poweroff"
+		}
+	],
+	"provisioners": [
+		{
+			"type": "shell",
+			"environment_vars": [
+				"IPERF_VERSION=iperf-{{ user `iperf_version` }}"
+			],
+			"execute_command": "{{.Vars}} sh -x {{.Path}}",
+			"scripts": [
+				"scripts/10-disk.sh",
+				"scripts/20-base.sh",
+				"scripts/25-packages.sh",
+				"scripts/30-bootstrap.sh",
+				"scripts/90-cleanup.sh"
+			]
+		}
+	],
+	"post-processors": [
+		{
+			"type": "vagrant",
+			"compression_level": "9",
+			"output": "arch-iperf.box"
+		}
+	]
 }

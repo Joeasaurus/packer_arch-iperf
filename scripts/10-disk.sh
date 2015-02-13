@@ -1,26 +1,15 @@
-sfdisk --force /dev/sda <<EOF
+sfdisk -u S --force /dev/sda <<EOF
 # partition table of /dev/sda
-unit: sectors
 
-/dev/sda1 : start=  2048, size= 204800, Id=83
-/dev/sda2 : start=  206848, size= , Id=83
-/dev/sda3 : start=  0, size=  0, Id= 0
-/dev/sda4 : start=  0, size=  0, Id= 0
+/dev/sda1 : start=64,size=409600,Id=83,bootable
+/dev/sda2 : start=409664,size=,Id=83
 EOF
 
-# create filesystems
+# create filesystems & mount them
 mkfs.ext2  -L boot /dev/sda1
-mkfs.btrfs -L root /dev/sda2
+mkfs.ext4 -L root /dev/sda2
 
-# mount the root partition
-mkdir -p /mnt
-mount -o compress /dev/sda2 /mnt
-
-# mount the boot partition
-mkdir -p /mnt/boot
-mount /dev/sda1 /mnt/boot
-
-# create the root subvolume & mount it
-btrfs subvol create /mnt/@
 mkdir -p /mnt/root
-mount -o subvol=@ /dev/sda2 /mnt/root
+mount /dev/sda2 /mnt/root
+mkdir /mnt/root/boot
+mount /dev/sda1 /mnt/root/boot
