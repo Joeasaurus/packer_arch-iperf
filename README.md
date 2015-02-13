@@ -1,6 +1,12 @@
 Packer Arch
 ===========
 
+Notes
+-----
+If you are building on an ext4 filesystem, use this in the template.json:
+[ "storagectl", "{{.Name}}", "--name", "SATA Controller", "--hostiocache", "on" ]
+
+
 Packer Arch is a bare bones [Packer](http://www.packer.io/) template and
 installation script that can be used to generate a [Vagrant](http://www.vagrantup.com/)
 base box for [Arch Linux](https://www.archlinux.org/). The template works
