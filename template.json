@@ -60,8 +60,7 @@
 		{
 			"type": "vagrant",
 			"compression_level": "9",
-			"output": "arch-iperf.box",
-			"vagrantfile_template": "./Vagrantfile"
+			"output": "arch-iperf.box"
 		}
 	]
 }
