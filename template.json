@@ -21,10 +21,12 @@
 			"iso_checksum_type": "{{ user `iso_checksum_type` }}",
 			"guest_os_type": "ArchLinux_64",
 			"guest_additions_mode": "disable",
+			"headless": true,
 			"http_directory": ".",
 			"boot_wait": "10s",
 			"boot_command": [
-				"<enter><wait10><wait10>",
+				"<enter><wait5><wait5>",
+				"<wait10><wait10>",
 				"echo 'root:root' | chpasswd<enter>",
 				"ssh-keygen -A<enter><wait>",
 				"systemctl reenable sshd.service<enter>",
