@@ -1,0 +1,13 @@
+{
+    "name": "arch-iperf",
+    "description": "This box runs Arch Linux, with an iperf3 server running at boot time.",
+    "versions": [{
+        "version": "0.1.0",
+        "providers": [{
+                "name": "virtualbox",
+                "url": "http://localhost/jme/boxes/arch-iperf/arch-iperf.0.1.0.box",
+                "checksum_type": "sha1",
+                "checksum": "55906b12d4c896099b9db474c29456ee93dc547d"
+        }]
+    }]
+}

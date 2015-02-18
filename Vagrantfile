@@ -1,6 +1,6 @@
 INTERFACE = "en0: Ethernet"
 IP_ADDR = "10.10.10.2"
-BOX_URL = "http://localhost/jme/arch-iperf.box"
+BOX_URL = "http://localhost/jme/boxes/arch-iperf/metadata.json"
 
 ENABLE_GUI = false
 
@@ -35,5 +35,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	# Extra improvements
 	config.vm.synced_folder '.', '/vagrant', disabled: true
+	config.vm.box_check_update = false
 end
 
