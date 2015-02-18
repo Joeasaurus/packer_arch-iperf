@@ -45,22 +45,6 @@ should be good to clone this repo and go:
 
 Then you can import the generated box into Vagrant:
 
-    $ vagrant box add arch-iperf.box
-
-### VMware Provider
-
-Assuming that you already have Packer,
-[VMware Fusion](https://www.vmware.com/products/fusion/) (or
-[VMware Workstation](https://www.vmware.com/products/workstation/)), and
-Vagrant with the VMware provider installed, you should be good to clone
-this repo and go:
-
-    $ git clone https://github.com/elasticdog/packer-arch.git
-    $ cd packer-arch/
-    $ packer build -only=vmware-iso arch-template.json
-
-Then you can import the generated box into Vagrant:
-
     $ vagrant box add arch-iperf arch-iperf.box
 
 I have, however, included a Vagrantfile that's ready to use. Simply edit the settings
