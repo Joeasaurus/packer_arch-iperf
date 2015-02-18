@@ -1,5 +1,5 @@
 # Some pacman clean commands
-arch-chroot /mnt/root /bin/bash -x <<'SHELL'
+arch-chroot /mnt/root /bin/bash <<'SHELL'
 pacman -Scc --noconfirm
 pacman -Rns --noconfirm $(pacman -Qtdq)
 pacman -Rcnsu --noconfirm autoconf bison \
