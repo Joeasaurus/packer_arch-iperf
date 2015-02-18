@@ -1,5 +1,5 @@
 # Basic system settings
-arch-chroot /mnt/root /bin/bash -x <<SYS
+arch-chroot /mnt/root /bin/bash <<SYS
 echo "archlinux" > /etc/hostname
 
 ln -s /usr/share/zoneinfo/UTC /etc/localtime
@@ -13,7 +13,7 @@ mkinitcpio -p linux
 SYS
 
 # Grub
-arch-chroot /mnt/root /bin/bash -x <<'GRUB'
+arch-chroot /mnt/root /bin/bash <<'GRUB'
 modprobe dm-mod
 
 grub-install --recheck /dev/sda
@@ -23,7 +23,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 GRUB
 
 # Users
-arch-chroot /mnt/root /bin/bash -x <<'USER'
+arch-chroot /mnt/root /bin/bash <<'USER'
 groupadd vagrant
 useradd -m -g users -G vagrant,vboxsf vagrant
 
@@ -32,7 +32,7 @@ echo "vagrant:$(openssl passwd -crypt 'vagrant')" | chpasswd
 USER
 
 # SSH
-arch-chroot /mnt/root /bin/bash -x <<'SSH'
+arch-chroot /mnt/root /bin/bash <<'SSH'
 sed -i '$ i\
 	UseDNS no' /etc/ssh/sshd_config
 echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/10-vagrant
@@ -53,7 +53,7 @@ vboxvideo
 MODULES
 
 # iperf3
-arch-chroot /mnt/root /bin/bash -x <<IPERF
+arch-chroot /mnt/root /bin/bash <<IPERF
 mkdir -p /tmp/iperf3 && \
 	cd /tmp/iperf3 && \
 	curl -o iperf.tgz "http://downloads.es.net/pub/iperf/${IPERF_VERSION}.tar.gz" && \
@@ -76,7 +76,7 @@ Type=forking
 WantedBy=multi-user.target
 IPERF_SERVICE
 
-arch-chroot /mnt/root /bin/bash -x <<SERVICES
+arch-chroot /mnt/root /bin/bash <<SERVICES
 systemctl enable dhcpcd.service
 systemctl enable sshd.service
 systemctl enable iperf3.service
