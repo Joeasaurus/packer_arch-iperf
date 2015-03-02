@@ -18,16 +18,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# Bridged inf for using iperf on
 	config.vm.network :public_network, ip: IP_ADDR, bridge: INTERFACE
 
+	# Custom settings
+	if CUSTOM_RAM
+		config.vm.memory = CUSTOM_RAM
+	end
+
+	if CUSTOM_CPU
+		config.vm.cpus = CUSTOM_CPU
+	end
+
 	config.vm.provider :virtualbox do |vb|
 		vb.gui = ENABLE_GUI
-
-		if CUSTOM_RAM
-			vb.memory = CUSTOM_RAM
-		end
-
-		if CUSTOM_CPU
-			vb.cpus = CUSTOM_CPU
-		end
 
 		# This reduces the amount of time to boot (merginally)
 		vb.customize ["modifyvm", :id, "--bioslogodisplaytime", "1"]
